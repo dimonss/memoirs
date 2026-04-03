@@ -1,8 +1,10 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { BookProvider } from './context/BookContext';
-import Reader from './components/Reader';
 import Sidebar from './components/Sidebar';
-import TableOfContents from './components/TableOfContents';
+
+const Reader = lazy(() => import('./components/Reader'));
+const TableOfContents = lazy(() => import('./components/TableOfContents'));
 
 function App() {
   return (
@@ -11,11 +13,13 @@ function App() {
         <div className="app">
           <Sidebar />
           <div className="app-main">
-            <Routes>
-              <Route path="/" element={<TableOfContents />} />
-              <Route path="/chapter/:chapterId/page/:pageId" element={<Reader />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <Suspense fallback={<div className="loading-fallback"><div className="spinner"></div>Загрузка...</div>}>
+              <Routes>
+                <Route path="/" element={<TableOfContents />} />
+                <Route path="/chapter/:chapterId/page/:pageId" element={<Reader />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </div>
         </div>
       </BookProvider>
