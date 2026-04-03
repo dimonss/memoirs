@@ -6,7 +6,7 @@ import TableOfContents from './components/TableOfContents';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={"/memoirs"}>
       <BookProvider>
         <div className="app">
           <Sidebar />
