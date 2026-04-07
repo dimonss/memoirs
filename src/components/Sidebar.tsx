@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useBook } from '../context/BookContext';
+import { useAuth } from '../context/AuthContext';
 import { chapters } from '../data/chapters';
 import {
     X,
@@ -7,12 +8,19 @@ import {
     Bookmark as BookmarkIcon,
     Trash2,
     ChevronRight,
+    LogIn,
+    LogOut,
+    Lock,
 } from 'lucide-react';
 import { useState } from 'react';
 
 type Tab = 'chapters' | 'bookmarks';
 
-export default function Sidebar() {
+interface SidebarProps {
+    onLoginClick: () => void;
+}
+
+export default function Sidebar({ onLoginClick }: SidebarProps) {
     const navigate = useNavigate();
     const {
         sidebarOpen,
@@ -21,13 +29,33 @@ export default function Sidebar() {
         removeBookmark,
         currentPosition,
         getChapterProgress,
+        isSyncing,
     } = useBook();
+    const { user, isLoggedIn, logout } = useAuth();
     const [activeTab, setActiveTab] = useState<Tab>('chapters');
 
     function navigateTo(chapterId: string, pageId: string) {
         navigate(`/chapter/${chapterId}/page/${pageId}`);
         closeSidebar();
     }
+
+    async function handleLogout() {
+        await logout();
+        closeSidebar();
+    }
+
+    function handleBookmarksTabClick() {
+        if (!isLoggedIn) {
+            onLoginClick();
+            return;
+        }
+        setActiveTab('bookmarks');
+    }
+
+    // Display name helper
+    const displayName = user
+        ? (user.firstName || user.username || user.email?.split('@')[0] || 'Читатель')
+        : null;
 
     return (
         <>
@@ -57,12 +85,16 @@ export default function Sidebar() {
                     </button>
                     <button
                         className={`sidebar-tab ${activeTab === 'bookmarks' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('bookmarks')}
+                        onClick={handleBookmarksTabClick}
+                        title={isLoggedIn ? undefined : 'Войдите, чтобы использовать закладки'}
                     >
                         <BookmarkIcon size={16} />
                         <span>Закладки</span>
-                        {bookmarks.length > 0 && (
+                        {isLoggedIn && bookmarks.length > 0 && (
                             <span className="badge">{bookmarks.length}</span>
+                        )}
+                        {!isLoggedIn && (
+                            <Lock size={12} className="sidebar-tab-lock" />
                         )}
                     </button>
                 </div>
@@ -101,8 +133,14 @@ export default function Sidebar() {
                         </ul>
                     )}
 
-                    {activeTab === 'bookmarks' && (
+                    {activeTab === 'bookmarks' && isLoggedIn && (
                         <>
+                            {isSyncing && (
+                                <div className="sidebar-syncing">
+                                    <div className="spinner spinner-sm" />
+                                    <span>Сохраняем...</span>
+                                </div>
+                            )}
                             {bookmarks.length === 0 ? (
                                 <div className="sidebar-empty">
                                     <BookmarkIcon size={48} strokeWidth={1} />
@@ -147,6 +185,45 @@ export default function Sidebar() {
                         <BookOpen size={16} />
                         <span>К содержанию</span>
                     </button>
+
+                    {/* User block */}
+                    {isLoggedIn && user ? (
+                        <div className="sidebar-user">
+                            {user.photoUrl ? (
+                                <img
+                                    src={user.photoUrl}
+                                    alt={displayName ?? 'Аватар'}
+                                    className="sidebar-user-avatar"
+                                />
+                            ) : (
+                                <div className="sidebar-user-avatar sidebar-user-avatar-placeholder">
+                                    {(displayName ?? '?')[0].toUpperCase()}
+                                </div>
+                            )}
+                            <div className="sidebar-user-info">
+                                <span className="sidebar-user-name">{displayName}</span>
+                                {user.email && (
+                                    <span className="sidebar-user-email">{user.email}</span>
+                                )}
+                            </div>
+                            <button
+                                className="icon-btn icon-btn-sm danger"
+                                onClick={handleLogout}
+                                title="Выйти"
+                            >
+                                <LogOut size={16} />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            className="btn btn-auth-hint"
+                            onClick={onLoginClick}
+                            id="sidebar-login-btn"
+                        >
+                            <LogIn size={16} />
+                            <span>Войти</span>
+                        </button>
+                    )}
                 </div>
             </aside>
         </>

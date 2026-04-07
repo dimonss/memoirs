@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+> Example SSH Reverse Tunnel command:
+> ```bash
+> ssh -R 8090:localhost:5173 root@chalysh.pro -N
+> ```

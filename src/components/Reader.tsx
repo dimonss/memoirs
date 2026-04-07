@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBook } from '../context/BookContext';
+import { useAuth } from '../context/AuthContext';
 import { getChapter } from '../data/chapters';
 import {
     ChevronLeft,
@@ -8,6 +9,8 @@ import {
     Bookmark,
     BookmarkCheck,
     Menu,
+    Lock,
+    X,
 } from 'lucide-react';
 
 export default function Reader() {
@@ -20,10 +23,14 @@ export default function Reader() {
         removeBookmark,
         toggleSidebar,
     } = useBook();
+    const { isLoggedIn, openLoginModal } = useAuth();
 
     const chapter = chapterId ? getChapter(chapterId) : undefined;
     const page = chapter?.pages.find(p => p.id === pageId);
     const pageIndex = chapter?.pages.findIndex(p => p.id === pageId) ?? -1;
+
+    // Auth hint banner state (shown briefly when unauth user tries to bookmark)
+    const [showAuthHint, setShowAuthHint] = useState(false);
 
     // Sync position to context
     useEffect(() => {
@@ -64,6 +71,12 @@ export default function Reader() {
     const bookmarked = isBookmarked(chapterId!, pageId!);
 
     function toggleBookmark() {
+        if (!isLoggedIn) {
+            // Show inline hint and open modal
+            setShowAuthHint(true);
+            openLoginModal();
+            return;
+        }
         if (bookmarked) {
             removeBookmark(chapterId!, pageId!);
         } else {
@@ -92,6 +105,27 @@ export default function Reader() {
 
     return (
         <div className="reader">
+            {/* Auth hint banner */}
+            {showAuthHint && !isLoggedIn && (
+                <div className="auth-hint-banner" role="status">
+                    <Lock size={14} />
+                    <span>Войдите, чтобы сохранять закладки</span>
+                    <button
+                        className="auth-hint-login-btn"
+                        onClick={() => { openLoginModal(); }}
+                    >
+                        Войти
+                    </button>
+                    <button
+                        className="auth-hint-close"
+                        onClick={() => setShowAuthHint(false)}
+                        aria-label="Закрыть"
+                    >
+                        <X size={14} />
+                    </button>
+                </div>
+            )}
+
             {/* Top bar */}
             <header className="reader-header">
                 <button className="icon-btn" onClick={toggleSidebar} title="Меню">
@@ -105,11 +139,23 @@ export default function Reader() {
                     </span>
                 </div>
                 <button
-                    className={`icon-btn bookmark-btn ${bookmarked ? 'active' : ''}`}
+                    className={`icon-btn bookmark-btn ${bookmarked ? 'active' : ''} ${!isLoggedIn ? 'bookmark-btn-locked' : ''}`}
                     onClick={toggleBookmark}
-                    title={bookmarked ? 'Убрать закладку' : 'Добавить закладку'}
+                    title={
+                        !isLoggedIn
+                            ? 'Войдите, чтобы добавить закладку'
+                            : bookmarked
+                                ? 'Убрать закладку'
+                                : 'Добавить закладку'
+                    }
+                    id="reader-bookmark-btn"
                 >
-                    {bookmarked ? <BookmarkCheck size={22} /> : <Bookmark size={22} />}
+                    {!isLoggedIn
+                        ? <Lock size={18} />
+                        : bookmarked
+                            ? <BookmarkCheck size={22} />
+                            : <Bookmark size={22} />
+                    }
                 </button>
             </header>
 
