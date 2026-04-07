@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useBook } from '../context/BookContext';
 import { chapters, getTotalPages } from '../data/chapters';
-import { BookOpen, Bookmark, ArrowRight } from 'lucide-react';
+import { BookOpen, Bookmark, ArrowRight, LogIn, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function TableOfContents() {
     const navigate = useNavigate();
     const { currentPosition, getChapterProgress, bookmarks } = useBook();
+    const { isLoggedIn, openLoginModal } = useAuth();
 
     const totalPages = getTotalPages();
     const hasLastPosition = currentPosition.chapterId && currentPosition.pageId;
@@ -31,18 +33,39 @@ export default function TableOfContents() {
                         <span>{totalPages} страниц</span>
                     </div>
                     <div className="toc-stat-divider" />
-                    <div className="toc-stat">
-                        <Bookmark size={18} />
-                        <span>{bookmarks.length} закладок</span>
-                    </div>
+                    {!isLoggedIn ? (
+                        <button
+                            className="toc-stat toc-stat-btn"
+                            onClick={openLoginModal}
+                            title="Войдите, чтобы использовать закладки"
+                        >
+                            <Lock size={12} className="toc-stat-lock" />
+                            <Bookmark size={18} />
+                            <span>Закладки</span>
+                        </button>
+                    ) : (
+                        <div className="toc-stat">
+                            <Bookmark size={18} />
+                            <span>{bookmarks.length} закладок</span>
+                        </div>
+                    )}
                 </div>
 
-                {hasLastPosition && (
-                    <button className="btn btn-primary btn-lg toc-continue" onClick={continueReading}>
-                        <span>Продолжить чтение</span>
-                        <ArrowRight size={18} />
-                    </button>
-                )}
+                <div className="toc-actions">
+                    {hasLastPosition && (
+                        <button className="btn btn-primary btn-lg toc-continue" onClick={continueReading}>
+                            <span>Продолжить чтение</span>
+                            <ArrowRight size={18} />
+                        </button>
+                    )}
+
+                    {!isLoggedIn && (
+                        <button className="btn btn-auth-hint" onClick={openLoginModal}>
+                            <LogIn size={18} />
+                            <span>Войти</span>
+                        </button>
+                    )}
+                </div>
             </header>
 
             {/* Chapter grid */}

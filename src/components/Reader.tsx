@@ -150,12 +150,7 @@ export default function Reader() {
                     }
                     id="reader-bookmark-btn"
                 >
-                    {!isLoggedIn
-                        ? <Lock size={18} />
-                        : bookmarked
-                            ? <BookmarkCheck size={22} />
-                            : <Bookmark size={22} />
-                    }
+                    {bookmarked ? <BookmarkCheck size={22} /> : <Bookmark size={22} />}
                 </button>
             </header>
 
