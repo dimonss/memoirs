@@ -833,6 +833,26 @@ a:hover { color: var(--accent-light); }
   margin-top: var(--space-xl);
 }
 
+.toc-footer {
+  margin-top: var(--space-2xl);
+  display: flex;
+  justify-content: center;
+  padding-bottom: var(--space-xl);
+}
+
+.toc-footer-logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+.toc-footer-logout:hover {
+  opacity: 1;
+  color: var(--danger);
+}
+
 .toc-continue {
   margin-top: 0;
 }

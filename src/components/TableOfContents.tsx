@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { useBook } from '../context/BookContext';
 import { chapters, getTotalPages } from '../data/chapters';
-import { BookOpen, Bookmark, ArrowRight, LogIn, Lock } from 'lucide-react';
+import { BookOpen, Bookmark, ArrowRight, LogIn, Lock, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import LogoutModal from './auth/LogoutModal';
 
 export default function TableOfContents() {
     const navigate = useNavigate();
     const { currentPosition, getChapterProgress, bookmarks } = useBook();
-    const { isLoggedIn, openLoginModal } = useAuth();
+    const { isLoggedIn, openLoginModal, logout } = useAuth();
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
     const totalPages = getTotalPages();
     const hasLastPosition = currentPosition.chapterId && currentPosition.pageId;
@@ -113,6 +116,25 @@ export default function TableOfContents() {
                     })}
                 </div>
             </section>
+
+            {/* Logout button at the very bottom, subtle */}
+            {isLoggedIn && (
+                <div className="toc-footer">
+                    <button className="toc-stat-btn toc-footer-logout" onClick={() => setLogoutModalOpen(true)}>
+                        <LogOut size={14} />
+                        <span>Выйти из аккаунта</span>
+                    </button>
+                </div>
+            )}
+
+            <LogoutModal
+                isOpen={logoutModalOpen}
+                onClose={() => setLogoutModalOpen(false)}
+                onConfirm={async () => {
+                    setLogoutModalOpen(false);
+                    await logout();
+                }}
+            />
         </div>
     );
 }
