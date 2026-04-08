@@ -12,6 +12,7 @@ import {
     LogOut,
     Lock,
 } from 'lucide-react';
+import LogoutModal from './auth/LogoutModal';
 import { useState } from 'react';
 
 type Tab = 'chapters' | 'bookmarks';
@@ -33,6 +34,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
     } = useBook();
     const { user, isLoggedIn, logout } = useAuth();
     const [activeTab, setActiveTab] = useState<Tab>('chapters');
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
     function navigateTo(chapterId: string, pageId: string) {
         navigate(`/chapter/${chapterId}/page/${pageId}`);
@@ -40,6 +42,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
     }
 
     async function handleLogout() {
+        setLogoutModalOpen(false);
         await logout();
         closeSidebar();
     }
@@ -208,7 +211,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
                             </div>
                             <button
                                 className="icon-btn icon-btn-sm danger"
-                                onClick={handleLogout}
+                                onClick={() => setLogoutModalOpen(true)}
                                 title="Выйти"
                             >
                                 <LogOut size={16} />
@@ -226,6 +229,13 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
                     )}
                 </div>
             </aside>
+
+            {/* Logout Modal */}
+            <LogoutModal
+                isOpen={logoutModalOpen}
+                onClose={() => setLogoutModalOpen(false)}
+                onConfirm={handleLogout}
+            />
         </>
     );
 }

@@ -1393,3 +1393,40 @@ a:hover { color: var(--accent-light); }
   box-shadow: var(--shadow-glow);
 }
 
+/* ===========================
+   Auth — Logout Modal
+   =========================== */
+.logout-icon {
+  color: var(--danger);
+  background: rgba(229, 91, 91, 0.1);
+  border-color: rgba(229, 91, 91, 0.3);
+}
+
+.logout-modal-actions {
+  display: flex;
+  gap: var(--space-md);
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+.logout-modal-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border: 1px solid var(--danger);
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-danger:hover {
+  background: #f26868; /* brighter version */
+  transform: translateY(-1px);
+}
+
