@@ -43,15 +43,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const [loading, setLoading] = useState(false);
     const googleBtnRef = useRef<HTMLDivElement>(null);
     const tgContainerRef = useRef<HTMLDivElement>(null);
-    const googleReady = useRef(false);
 
     // Google Sign-In
     useEffect(() => {
         if (!isOpen || !GOOGLE_CLIENT_ID) return;
 
         const initGoogle = () => {
-            if (!window.google || googleReady.current) return;
-            googleReady.current = true;
+            if (!window.google) return;
 
             window.google.accounts.id.initialize({
                 client_id: GOOGLE_CLIENT_ID,
@@ -180,38 +178,36 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     </div>
                 )}
 
-                {!loading && (
-                    <div className="login-modal-providers">
-                        {/* Google */}
-                        {GOOGLE_CLIENT_ID && (
-                            <div className="login-provider-section">
-                                <div
-                                    ref={googleBtnRef}
-                                    className="login-google-btn-wrapper"
-                                    id="google-signin-btn"
-                                />
-                            </div>
-                        )}
+                <div className="login-modal-providers" style={{ display: loading ? 'none' : 'flex' }}>
+                    {/* Google */}
+                    {GOOGLE_CLIENT_ID && (
+                        <div className="login-provider-section">
+                            <div
+                                ref={googleBtnRef}
+                                className="login-google-btn-wrapper"
+                                id="google-signin-btn"
+                            />
+                        </div>
+                    )}
 
-                        {/* Divider */}
-                        {GOOGLE_CLIENT_ID && TELEGRAM_BOT_NAME && (
-                            <div className="login-divider">
-                                <span>или</span>
-                            </div>
-                        )}
+                    {/* Divider */}
+                    {GOOGLE_CLIENT_ID && TELEGRAM_BOT_NAME && (
+                        <div className="login-divider">
+                            <span>или</span>
+                        </div>
+                    )}
 
-                        {/* Telegram */}
-                        {TELEGRAM_BOT_NAME && (
-                            <div className="login-provider-section">
-                                <div
-                                    ref={tgContainerRef}
-                                    className="login-telegram-btn-wrapper"
-                                    id="telegram-signin-btn"
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
+                    {/* Telegram */}
+                    {TELEGRAM_BOT_NAME && (
+                        <div className="login-provider-section">
+                            <div
+                                ref={tgContainerRef}
+                                className="login-telegram-btn-wrapper"
+                                id="telegram-signin-btn"
+                            />
+                        </div>
+                    )}
+                </div>
 
                 <p className="login-modal-disclaimer">
                     Авторизуясь, вы принимаете условия использования сервиса
