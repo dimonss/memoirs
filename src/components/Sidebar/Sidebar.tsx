@@ -1,7 +1,8 @@
+import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
-import { useBook } from '../context/BookContext';
-import { useAuth } from '../context/AuthContext';
-import { chapters } from '../data/chapters';
+import { useBook } from '../../context/BookContext';
+import { useAuth } from '../../context/AuthContext';
+import { chapters } from '../../data/chapters';
 import {
     X,
     BookOpen,
@@ -12,7 +13,7 @@ import {
     LogOut,
     Lock,
 } from 'lucide-react';
-import LogoutModal from './auth/LogoutModal';
+import LogoutModal from '../auth/LogoutModal/LogoutModal';
 import { useState } from 'react';
 
 type Tab = 'chapters' | 'bookmarks';

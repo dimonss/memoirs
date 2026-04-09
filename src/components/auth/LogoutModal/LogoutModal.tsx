@@ -1,3 +1,4 @@
+import './LogoutModal.css';
 import { useEffect } from 'react';
 import { X, LogOut } from 'lucide-react';
 

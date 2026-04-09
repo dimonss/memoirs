@@ -1,7 +1,8 @@
+import './BookmarksModal.css';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Bookmark as BookmarkIcon, Trash2 } from 'lucide-react';
-import { useBook } from '../context/BookContext';
+import { useBook } from '../../context/BookContext';
 
 interface BookmarksModalProps {
     isOpen: boolean;

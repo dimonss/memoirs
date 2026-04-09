@@ -1,0 +1,206 @@
+/* ===========================
+   Auth — Login Modal
+   =========================== */
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.login-modal {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-xl);
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(201, 166, 107, 0.1);
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  opacity: 0.5;
+}
+.login-modal-close:hover { opacity: 1; }
+
+.login-modal-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.login-modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+
+.login-modal-title {
+  font-family: var(--font-book);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.login-modal-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 280px;
+  text-align: center;
+}
+
+.login-modal-error {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(229, 91, 91, 0.1);
+  border: 1px solid rgba(229, 91, 91, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.login-modal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.login-modal-providers {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.login-provider-section {
+  display: flex;
+  justify-content: center;
+}
+
+.login-google-btn-wrapper,
+.login-telegram-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--space-md);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.login-modal-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ===========================
+   Auth — Login button in sidebar footer
+   =========================== */
+.btn-auth-hint {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-sm);
+  background: linear-gradient(45deg, var(--accent-dim), rgba(201, 166, 107, 0.15));
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(201, 166, 107, 0.2);
+  animation: auth-pulse-glow 2.5s infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes auth-pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(201, 166, 107, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(201, 166, 107, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 166, 107, 0); }
+}
+
+.btn-auth-hint::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  transform: rotate(45deg);
+  animation: auth-shine-sweep 4s infinite;
+}
+
+@keyframes auth-shine-sweep {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  20%, 100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.btn-auth-hint:hover {
+  background: var(--accent);
+  color: #0d0b0e;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(201, 166, 107, 0.4);
+  transform: translateY(-2px);
+}
+

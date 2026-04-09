@@ -1,6 +1,7 @@
+import './LoginModal.css';
 import { useState, useEffect, useRef } from 'react';
 import { X, LogIn } from 'lucide-react';
-import { useAuth, type TelegramLoginData } from '../../context/AuthContext';
+import { useAuth, type TelegramLoginData } from '../../../context/AuthContext';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';
 const TELEGRAM_BOT_NAME = import.meta.env.VITE_TELEGRAM_BOT_NAME ?? '';

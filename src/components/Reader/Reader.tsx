@@ -1,8 +1,9 @@
+import './Reader.css';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useBook } from '../context/BookContext';
-import { useAuth } from '../context/AuthContext';
-import { getChapter } from '../data/chapters';
+import { useBook } from '../../context/BookContext';
+import { useAuth } from '../../context/AuthContext';
+import { getChapter } from '../../data/chapters';
 import {
     ChevronLeft,
     ChevronRight,

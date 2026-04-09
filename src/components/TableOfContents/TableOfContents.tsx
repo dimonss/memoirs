@@ -1,11 +1,12 @@
+import './TableOfContents.css';
 import { useNavigate } from 'react-router-dom';
-import { useBook } from '../context/BookContext';
-import { chapters, getTotalPages } from '../data/chapters';
+import { useBook } from '../../context/BookContext';
+import { chapters, getTotalPages } from '../../data/chapters';
 import { BookOpen, Bookmark, ArrowRight, LogIn, Lock, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
-import LogoutModal from './auth/LogoutModal';
-import BookmarksModal from './BookmarksModal';
+import LogoutModal from '../auth/LogoutModal/LogoutModal';
+import BookmarksModal from '../BookmarksModal/BookmarksModal';
 
 export default function TableOfContents() {
     const navigate = useNavigate();

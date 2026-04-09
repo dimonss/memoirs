@@ -2,11 +2,11 @@ import { Suspense, lazy, useState, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { BookProvider } from './context/BookContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Sidebar from './components/Sidebar';
-import LoginModal from './components/auth/LoginModal';
+import Sidebar from './components/Sidebar/Sidebar';
+import LoginModal from './components/auth/LoginModal/LoginModal';
 
-const Reader = lazy(() => import('./components/Reader'));
-const TableOfContents = lazy(() => import('./components/TableOfContents'));
+const Reader = lazy(() => import('./components/Reader/Reader'));
+const TableOfContents = lazy(() => import('./components/TableOfContents/TableOfContents'));
 
 /* ------------------------------------------------------------------ */
 /*  Inner app — needs access to AuthContext                            */
