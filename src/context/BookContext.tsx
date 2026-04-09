@@ -20,8 +20,8 @@ interface ReadingPosition {
     pageId: string;
 }
 
-/** Shape stored in additionalFields.memoirsOpus on the backend */
-interface MemoirsOpusFields {
+/** Shape stored in additionalFields.memoirs on the backend */
+interface MemoirsFields {
     bookmarks?: Bookmark[];
     readingProgress?: Record<string, number>;
     lastPosition?: ReadingPosition;
@@ -51,9 +51,9 @@ interface BookContextType {
 /*  Storage helpers (localStorage — only for position & progress)     */
 /* ------------------------------------------------------------------ */
 
-const STORAGE_KEY_POSITION = 'memoirs-opus-position';
-const STORAGE_KEY_PROGRESS = 'memoirs-opus-progress';
-const APP_KEY = 'memoirsOpus';
+const STORAGE_KEY_POSITION = 'memoirs-position';
+const STORAGE_KEY_PROGRESS = 'memoirs-progress';
+const APP_KEY = 'memoirs';
 
 const defaultPosition: ReadingPosition = {
     chapterId: chapters[0].id,
@@ -117,7 +117,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
 
         try {
             const fields = await authService.getFields();
-            const appData = (fields[APP_KEY] as MemoirsOpusFields | undefined) ?? {};
+            const appData = (fields[APP_KEY] as MemoirsFields | undefined) ?? {};
 
             if (appData.bookmarks) {
                 setBookmarks(appData.bookmarks);
@@ -143,7 +143,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
                 }
             }
         } catch (err) {
-            console.error('[memoirsOpus] Failed to sync from backend:', err);
+            console.error('[ChalyshMemoirs] Failed to sync from backend:', err);
         }
     }, []);
 
@@ -175,7 +175,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
         progressSyncTimer.current = setTimeout(async () => {
             try {
                 const fields = await authService.getFields();
-                const appData = (fields[APP_KEY] as MemoirsOpusFields | undefined) ?? {};
+                const appData = (fields[APP_KEY] as MemoirsFields | undefined) ?? {};
                 await authService.updateFields({
                     [APP_KEY]: {
                         ...appData,
@@ -184,7 +184,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
                     },
                 });
             } catch (err) {
-                console.error('[memoirsOpus] Failed to sync progress:', err);
+                console.error('[ChalyshMemoirs] Failed to sync progress:', err);
             }
         }, 3000);
     }, []);
@@ -198,7 +198,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
         setIsSyncing(true);
         try {
             const fields = await authService.getFields();
-            const appData = (fields[APP_KEY] as MemoirsOpusFields | undefined) ?? {};
+            const appData = (fields[APP_KEY] as MemoirsFields | undefined) ?? {};
             await authService.updateFields({
                 [APP_KEY]: {
                     ...appData,
@@ -206,7 +206,7 @@ export function BookProvider({ children, onAuthRequired }: BookProviderProps): R
                 },
             });
         } catch (err) {
-            console.error('[memoirsOpus] Failed to sync bookmarks:', err);
+            console.error('[ChalyshMemoirs] Failed to sync bookmarks:', err);
         } finally {
             setIsSyncing(false);
         }
