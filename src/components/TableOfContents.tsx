@@ -5,12 +5,14 @@ import { BookOpen, Bookmark, ArrowRight, LogIn, Lock, LogOut } from 'lucide-reac
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import LogoutModal from './auth/LogoutModal';
+import BookmarksModal from './BookmarksModal';
 
 export default function TableOfContents() {
     const navigate = useNavigate();
     const { currentPosition, getChapterProgress, bookmarks } = useBook();
     const { isLoggedIn, openLoginModal, logout } = useAuth();
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+    const [bookmarksModalOpen, setBookmarksModalOpen] = useState(false);
 
     const totalPages = getTotalPages();
     const hasLastPosition = currentPosition.chapterId && currentPosition.pageId;
@@ -47,10 +49,14 @@ export default function TableOfContents() {
                             <span>Закладки</span>
                         </button>
                     ) : (
-                        <div className="toc-stat">
+                        <button
+                            className="toc-stat toc-stat-btn"
+                            onClick={() => setBookmarksModalOpen(true)}
+                            title="Открыть закладки"
+                        >
                             <Bookmark size={18} />
                             <span>{bookmarks.length} закладок</span>
-                        </div>
+                        </button>
                     )}
                 </div>
 
@@ -134,6 +140,10 @@ export default function TableOfContents() {
                     setLogoutModalOpen(false);
                     await logout();
                 }}
+            />
+            <BookmarksModal
+                isOpen={bookmarksModalOpen}
+                onClose={() => setBookmarksModalOpen(false)}
             />
         </div>
     );
