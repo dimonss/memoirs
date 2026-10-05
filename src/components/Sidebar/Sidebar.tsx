@@ -12,6 +12,8 @@ import {
     LogIn,
     LogOut,
     Lock,
+    RefreshCw,
+    UserPlus,
 } from 'lucide-react';
 import LogoutModal from '../auth/LogoutModal/LogoutModal';
 import { useState } from 'react';
@@ -33,18 +35,12 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
         getChapterProgress,
         isSyncing,
     } = useBook();
-    const { user, isLoggedIn, logout } = useAuth();
+    const { user, isLoggedIn, activeProvider, availableProviders, switchProvider } = useAuth();
     const [activeTab, setActiveTab] = useState<Tab>('chapters');
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
     function navigateTo(chapterId: string, pageId: string) {
         navigate(`/chapter/${chapterId}/page/${pageId}`);
-        closeSidebar();
-    }
-
-    async function handleLogout() {
-        setLogoutModalOpen(false);
-        await logout();
         closeSidebar();
     }
 
@@ -58,43 +54,54 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 
     // Display name helper
     const displayName = user
-        ? (user.firstName || user.username || user.email?.split('@')[0] || 'Читатель')
+        ? (user.firstName
+            ? `${user.firstName}${user.lastName ? ' ' + user.lastName : ''}`
+            : user.username ?? user.email ?? 'Читатель')
         : null;
 
     return (
         <>
-            {/* Overlay */}
+            {/* Backdrop */}
             <div
-                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+                className={`sidebar-backdrop ${sidebarOpen ? 'open' : ''}`}
                 onClick={closeSidebar}
+                aria-hidden="true"
             />
 
-            {/* Sidebar panel */}
-            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+            {/* Sidebar */}
+            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Навигация по книге">
+                {/* Header */}
                 <div className="sidebar-header">
-                    <h2 className="sidebar-title">Мемуары</h2>
-                    <button className="icon-btn" onClick={closeSidebar}>
-                        <X size={22} />
+                    <span className="sidebar-title">Меню</span>
+                    <button
+                        className="icon-btn icon-btn-sm"
+                        onClick={closeSidebar}
+                        aria-label="Закрыть меню"
+                    >
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="sidebar-tabs">
+                <div className="sidebar-tabs" role="tablist">
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'chapters'}
                         className={`sidebar-tab ${activeTab === 'chapters' ? 'active' : ''}`}
                         onClick={() => setActiveTab('chapters')}
                     >
                         <BookOpen size={16} />
-                        <span>Содержание</span>
+                        <span>Главы</span>
                     </button>
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'bookmarks'}
                         className={`sidebar-tab ${activeTab === 'bookmarks' ? 'active' : ''}`}
                         onClick={handleBookmarksTabClick}
-                        title={isLoggedIn ? undefined : 'Войдите, чтобы использовать закладки'}
                     >
                         <BookmarkIcon size={16} />
                         <span>Закладки</span>
-                        {isLoggedIn && bookmarks.length > 0 && (
+                        {bookmarks.length > 0 && (
                             <span className="badge">{bookmarks.length}</span>
                         )}
                         {!isLoggedIn && (
@@ -103,31 +110,42 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
                     </button>
                 </div>
 
-                {/* Content */}
+                {/* Syncing indicator */}
+                {isSyncing && (
+                    <div className="sidebar-syncing">
+                        <div className="spinner spinner-sm" />
+                        <span>Синхронизация...</span>
+                    </div>
+                )}
+
+                {/* Tab Content */}
                 <div className="sidebar-content">
                     {activeTab === 'chapters' && (
                         <ul className="chapter-list">
-                            {chapters.map(ch => {
+                            {chapters.map((ch, idx) => {
                                 const isCurrent = currentPosition.chapterId === ch.id;
                                 const progress = getChapterProgress(ch.id);
+
                                 return (
-                                    <li key={ch.id} className={`chapter-item ${isCurrent ? 'current' : ''}`}>
+                                    <li key={ch.id} className="chapter-item">
                                         <button
-                                            className="chapter-link"
+                                            className={`chapter-link ${isCurrent ? 'active' : ''}`}
                                             onClick={() => navigateTo(ch.id, ch.pages[0].id)}
                                         >
                                             <div className="chapter-number-badge">
-                                                {ch.number}
+                                                {idx + 1}
                                             </div>
                                             <div className="chapter-info">
                                                 <span className="chapter-name">{ch.title}</span>
                                                 <span className="chapter-subtitle">{ch.subtitle}</span>
-                                                <div className="chapter-progress-bar">
-                                                    <div
-                                                        className="chapter-progress-fill"
-                                                        style={{ width: `${progress}%` }}
-                                                    />
-                                                </div>
+                                                {progress > 0 && (
+                                                    <div className="chapter-progress-bar">
+                                                        <div
+                                                            className="chapter-progress-fill"
+                                                            style={{ width: `${progress}%` }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                             <ChevronRight size={16} className="chapter-arrow" />
                                         </button>
@@ -137,16 +155,10 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
                         </ul>
                     )}
 
-                    {activeTab === 'bookmarks' && isLoggedIn && (
+                    {activeTab === 'bookmarks' && (
                         <>
-                            {isSyncing && (
-                                <div className="sidebar-syncing">
-                                    <div className="spinner spinner-sm" />
-                                    <span>Сохраняем...</span>
-                                </div>
-                            )}
                             {bookmarks.length === 0 ? (
-                                <div className="sidebar-empty">
+                                <div className="empty-state">
                                     <BookmarkIcon size={48} strokeWidth={1} />
                                     <p>Нет сохранённых закладок</p>
                                     <span>Нажмите на иконку закладки при чтении, чтобы сохранить страницу</span>
@@ -192,31 +204,58 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 
                     {/* User block */}
                     {isLoggedIn && user ? (
-                        <div className="sidebar-user">
-                            {user.photoUrl ? (
-                                <img
-                                    src={user.photoUrl}
-                                    alt={displayName ?? 'Аватар'}
-                                    className="sidebar-user-avatar"
-                                />
-                            ) : (
-                                <div className="sidebar-user-avatar sidebar-user-avatar-placeholder">
-                                    {(displayName ?? '?')[0].toUpperCase()}
-                                </div>
-                            )}
-                            <div className="sidebar-user-info">
-                                <span className="sidebar-user-name">{displayName}</span>
-                                {user.email && (
-                                    <span className="sidebar-user-email">{user.email}</span>
+                        <div className="sidebar-user-container">
+                            <div className="sidebar-user">
+                                {user.photoUrl ? (
+                                    <img
+                                        src={user.photoUrl}
+                                        alt={displayName ?? 'Аватар'}
+                                        className="sidebar-user-avatar"
+                                    />
+                                ) : (
+                                    <div className="sidebar-user-avatar sidebar-user-avatar-placeholder">
+                                        {(displayName ?? '?')[0].toUpperCase()}
+                                    </div>
                                 )}
+                                <div className="sidebar-user-info">
+                                    <span className="sidebar-user-name">{displayName}</span>
+                                    {user.email && (
+                                        <span className="sidebar-user-email">{user.email}</span>
+                                    )}
+                                    {activeProvider && (
+                                        <span className="account-provider-tag">
+                                            {activeProvider === 'google' ? '🔵 Google' : '✈️ Telegram'}
+                                        </span>
+                                    )}
+                                </div>
+                                <button
+                                    className="icon-btn icon-btn-sm danger"
+                                    onClick={() => setLogoutModalOpen(true)}
+                                    title="Выйти"
+                                >
+                                    <LogOut size={16} />
+                                </button>
                             </div>
-                            <button
-                                className="icon-btn icon-btn-sm danger"
-                                onClick={() => setLogoutModalOpen(true)}
-                                title="Выйти"
-                            >
-                                <LogOut size={16} />
-                            </button>
+
+                            {availableProviders.length > 1 ? (
+                                <button
+                                    className="switch-account-btn"
+                                    onClick={() => switchProvider(activeProvider === 'google' ? 'telegram' : 'google')}
+                                    title={activeProvider === 'google' ? 'Переключить на Telegram' : 'Переключить на Google'}
+                                >
+                                    <RefreshCw size={13} />
+                                    <span>{activeProvider === 'google' ? '✈️ На Telegram' : '🔵 На Google'}</span>
+                                </button>
+                            ) : availableProviders.length === 1 && (
+                                <button
+                                    className="switch-account-btn add-account-btn"
+                                    onClick={() => setLogoutModalOpen(true)}
+                                    title={activeProvider === 'google' ? 'Войти через Telegram' : 'Войти через Google'}
+                                >
+                                    <UserPlus size={13} />
+                                    <span>{activeProvider === 'google' ? '+ ✈️ Войти в TG' : '+ 🔵 Войти в Google'}</span>
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <button
@@ -235,7 +274,6 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
             <LogoutModal
                 isOpen={logoutModalOpen}
                 onClose={() => setLogoutModalOpen(false)}
-                onConfirm={handleLogout}
             />
         </>
     );

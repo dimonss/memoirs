@@ -1,37 +1,247 @@
-/* ===========================
-   Auth — Logout Modal
-   =========================== */
-.logout-icon {
-  color: var(--danger);
-  background: rgba(229, 91, 91, 0.1);
-  border-color: rgba(229, 91, 91, 0.3);
+.memoirs-logout-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+    animation: memoirs-fadeIn 0.2s ease-out;
 }
 
-.logout-modal-actions {
-  display: flex;
-  gap: var(--space-md);
-  width: 100%;
-  margin-top: var(--space-md);
+@keyframes memoirs-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.logout-modal-actions .btn {
-  flex: 1;
-  justify-content: center;
+.memoirs-logout-modal-card {
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    background: var(--bg-card, #1e1a24);
+    border: 1px solid var(--border-accent, rgba(201, 166, 107, 0.25));
+    border-radius: var(--radius-lg, 20px);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-lg, 0 8px 40px rgba(0,0,0,0.5));
+    color: var(--text-primary, #f0ece4);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    font-family: var(--font-ui, sans-serif);
+    animation: memoirs-scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-danger {
-  background: var(--danger);
-  color: #fff;
-  border: 1px solid var(--danger);
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-md);
-  font-family: var(--font-ui);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.btn-danger:hover {
-  background: #f26868; /* brighter version */
-  transform: translateY(-1px);
+@keyframes memoirs-scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
+.memoirs-logout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.memoirs-logout-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.memoirs-logout-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(229, 91, 91, 0.15);
+    color: var(--danger, #e55b5b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.memoirs-logout-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary, #f0ece4);
+}
+
+.memoirs-logout-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6d6578);
+    margin-top: 2px;
+}
+
+.memoirs-logout-close-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+    color: var(--text-secondary, #a8a0b4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.memoirs-logout-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #f0ece4);
+}
+
+.memoirs-sso-warning {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md, 12px);
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.memoirs-sso-warning-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.memoirs-sso-warning strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #fef3c7;
+}
+
+.memoirs-logout-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.memoirs-logout-section-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted, #6d6578);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.memoirs-logout-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md, 12px);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.memoirs-logout-danger-row {
+    border-color: rgba(229, 91, 91, 0.3);
+    background: rgba(229, 91, 91, 0.08);
+}
+
+.memoirs-logout-option-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.memoirs-logout-option-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary, #f0ece4);
+}
+
+.memoirs-text-danger {
+    color: #f87171 !important;
+}
+
+.memoirs-logout-option-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted, #6d6578);
+}
+
+.memoirs-logout-btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.memoirs-add-provider-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem;
+    border-radius: var(--radius-md, 12px);
+    background: var(--accent-dim, rgba(201, 166, 107, 0.1));
+    border: 1px solid var(--border-accent, rgba(201, 166, 107, 0.25));
+}
+
+.memoirs-add-provider-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-light, #e4c78f);
+}
+
+.memoirs-add-provider-desc {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #a8a0b4);
+    line-height: 1.4;
+}
+
+.memoirs-add-provider-widget {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.4rem;
+}
+
+.memoirs-logout-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+@media (max-width: 500px) {
+    .memoirs-logout-modal-card {
+        padding: 1.1rem;
+        border-radius: 16px;
+    }
+
+    .memoirs-logout-option-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .memoirs-logout-btn {
+        width: 100%;
+    }
+
+    .memoirs-sso-warning {
+        padding: 0.75rem;
+    }
+}

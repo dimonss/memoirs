@@ -342,9 +342,66 @@
   text-overflow: ellipsis;
 }
 
+.sidebar-user-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.account-provider-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  margin-top: 2px;
+  width: fit-content;
+}
+
+.switch-account-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-family: var(--font-ui);
+  border-radius: var(--radius-sm);
+  background: var(--bg-glass);
+  border: 1px dashed var(--border-accent);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switch-account-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.switch-account-btn.add-account-btn {
+  border-style: solid;
+  border-color: var(--border);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.switch-account-btn.add-account-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-accent);
+  color: var(--accent);
+}
 
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
   }
 }
+

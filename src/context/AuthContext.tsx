@@ -6,24 +6,18 @@ import React, {
     useCallback,
     useRef,
 } from 'react';
-import { authService, type AuthUser } from '../services/AuthService';
+import {
+    authService,
+    getActiveProvider,
+    getAvailableProviders,
+    type AuthUser,
+    type AuthProviderType,
+} from '../services/AuthService';
 import { bookContextSyncRef } from './BookContext';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
-
-interface AuthContextType {
-    user: AuthUser | null;
-    isLoggedIn: boolean;
-    isLoading: boolean;
-    loginWithGoogle: (idToken: string) => Promise<void>;
-    loginWithTelegram: (data: TelegramLoginData) => Promise<void>;
-    logout: () => Promise<void>;
-    /** Call this to open the login modal (injected from App) */
-    openLoginModal: () => void;
-    setOpenLoginModal: (fn: () => void) => void;
-}
 
 export interface TelegramLoginData {
     id: number;
@@ -35,6 +29,21 @@ export interface TelegramLoginData {
     hash: string;
 }
 
+interface AuthContextType {
+    user: AuthUser | null;
+    isLoggedIn: boolean;
+    isLoading: boolean;
+    activeProvider: AuthProviderType | null;
+    availableProviders: AuthProviderType[];
+    loginWithGoogle: (idToken: string) => Promise<void>;
+    loginWithTelegram: (data: TelegramLoginData) => Promise<void>;
+    logout: (target?: AuthProviderType | 'all') => Promise<void>;
+    switchProvider: (provider: AuthProviderType) => Promise<void>;
+    /** Call this to open the login modal (injected from App) */
+    openLoginModal: () => void;
+    setOpenLoginModal: (fn: () => void) => void;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Context                                                            */
 /* ------------------------------------------------------------------ */
@@ -44,9 +53,18 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(() => authService.getUser());
     const [isLoading, setIsLoading] = useState(true);
+    const [activeProvider, setActiveProviderState] = useState<AuthProviderType | null>(() => getActiveProvider());
+    const [availableProviders, setAvailableProvidersState] = useState<AuthProviderType[]>(() => getAvailableProviders());
 
     // openLoginModal is injected by App after render
     const openLoginModalRef = useRef<() => void>(() => {});
+
+    const refreshState = useCallback(() => {
+        const prov = getActiveProvider();
+        setActiveProviderState(prov);
+        setAvailableProvidersState(getAvailableProviders());
+        setUser(authService.getUser());
+    }, []);
 
     // Restore session on mount
     useEffect(() => {
@@ -56,19 +74,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (ok) {
                 const u = authService.getUser();
                 setUser(u);
-                // Sync book data once session is confirmed
+                setActiveProviderState(getActiveProvider());
+                setAvailableProvidersState(getAvailableProviders());
                 bookContextSyncRef.syncFromBackend();
             } else {
                 setUser(null);
+                setActiveProviderState(getActiveProvider());
+                setAvailableProvidersState(getAvailableProviders());
             }
             setIsLoading(false);
         });
-        return () => { cancelled = true; };
-    }, []);
+
+        const handleStorage = (e: StorageEvent) => {
+            if (e.key?.includes('accessToken') || e.key?.includes('auth_provider')) {
+                refreshState();
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
+        return () => {
+            cancelled = true;
+            window.removeEventListener('storage', handleStorage);
+        };
+    }, [refreshState]);
 
     const loginWithGoogle = useCallback(async (idToken: string) => {
         const result = await authService.loginWithGoogle(idToken);
         setUser(result.user);
+        setActiveProviderState(getActiveProvider());
+        setAvailableProvidersState(getAvailableProviders());
         // Pull bookmarks & progress from backend after login
         await bookContextSyncRef.syncFromBackend();
     }, []);
@@ -76,15 +110,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loginWithTelegram = useCallback(async (data: TelegramLoginData) => {
         const result = await authService.loginWithTelegram(data);
         setUser(result.user);
+        setActiveProviderState(getActiveProvider());
+        setAvailableProvidersState(getAvailableProviders());
         // Pull bookmarks & progress from backend after login
         await bookContextSyncRef.syncFromBackend();
     }, []);
 
-    const logout = useCallback(async () => {
-        await authService.logout();
-        setUser(null);
-        // Clear bookmarks from memory on logout
-        bookContextSyncRef.clearBookmarks();
+    const logout = useCallback(async (target?: AuthProviderType | 'all') => {
+        await authService.logout(target);
+        const remaining = getActiveProvider();
+        if (remaining) {
+            const u = authService.getUser();
+            setUser(u);
+            setActiveProviderState(remaining);
+            setAvailableProvidersState(getAvailableProviders());
+            await bookContextSyncRef.syncFromBackend();
+        } else {
+            setUser(null);
+            setActiveProviderState(null);
+            setAvailableProvidersState([]);
+            bookContextSyncRef.clearBookmarks();
+        }
+    }, []);
+
+    const switchProvider = useCallback(async (provider: AuthProviderType) => {
+        setIsLoading(true);
+        try {
+            const u = await authService.switchProvider(provider);
+            setUser(u);
+            setActiveProviderState(provider);
+            setAvailableProvidersState(getAvailableProviders());
+            await bookContextSyncRef.syncFromBackend();
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     const openLoginModal = useCallback(() => {
@@ -100,9 +159,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             user,
             isLoggedIn: !!user,
             isLoading,
+            activeProvider,
+            availableProviders,
             loginWithGoogle,
             loginWithTelegram,
             logout,
+            switchProvider,
             openLoginModal,
             setOpenLoginModal,
         }}>

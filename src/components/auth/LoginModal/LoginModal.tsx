@@ -1,5 +1,6 @@
 import './LoginModal.css';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, LogIn } from 'lucide-react';
 import { useAuth, type TelegramLoginData } from '../../../context/AuthContext';
 
@@ -138,7 +139,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div
             className="login-modal-overlay"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
@@ -214,6 +215,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     Авторизуясь, вы принимаете условия использования сервиса
                 </p>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

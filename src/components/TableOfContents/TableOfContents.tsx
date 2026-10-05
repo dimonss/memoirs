@@ -11,7 +11,7 @@ import BookmarksModal from '../BookmarksModal/BookmarksModal';
 export default function TableOfContents() {
     const navigate = useNavigate();
     const { currentPosition, getChapterProgress, bookmarks } = useBook();
-    const { isLoggedIn, openLoginModal, logout } = useAuth();
+    const { isLoggedIn, openLoginModal } = useAuth();
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const [bookmarksModalOpen, setBookmarksModalOpen] = useState(false);
 
@@ -137,10 +137,6 @@ export default function TableOfContents() {
             <LogoutModal
                 isOpen={logoutModalOpen}
                 onClose={() => setLogoutModalOpen(false)}
-                onConfirm={async () => {
-                    setLogoutModalOpen(false);
-                    await logout();
-                }}
             />
             <BookmarksModal
                 isOpen={bookmarksModalOpen}
