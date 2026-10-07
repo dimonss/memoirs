@@ -1,77 +1,130 @@
-# React + TypeScript + Vite
+# Мемуары (Memoirs)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Интерактивное веб-приложение для чтения мемуаров с поддержкой авторизации, сохранения закладок и синхронизации прогресса чтения между устройствами.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Основные возможности
 
-## React Compiler
+- 📖 **Удобная читалка**:
+  - Постраничное чтение глав с плавной навигацией (кнопки, индикаторы страниц, горячие клавиши стрелок).
+  - Оглавление с индикатором прогресса по каждой главе.
+  - Боковое меню (Sidebar) для быстрого перехода по главам и сохранённым закладкам.
+- 🔖 **Система закладок**:
+  - Быстрое добавление и удаление закладок прямо во время чтения.
+  - Просмотр и управление закладками как в боковом меню, так и через модальное окно на главной странице.
+  - Удалённая синхронизация закладок при авторизации.
+- 🔐 **Авторизация читателя**:
+  - Вход через Google One Tap / Google Identity Services.
+  - Вход через Telegram Login Widget.
+  - Сохранение сессии и синхронизация прогресса чтения.
+- 🎨 **Адаптивный интерфейс**:
+  - Тёмная палитра в книжном оформлении.
+  - Поддержка мобильных устройств и десктопа.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠 Стек технологий
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Фреймворк**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Сборщик**: [Vite](https://vite.dev/)
+- **Маршрутизация**: [React Router v7](https://reactrouter.com/)
+- **Иконки**: [Lucide React](https://lucide.dev/)
+- **Стилизация**: Модульные CSS-файлы компонентов + глобальные дизайн-токены в `index.css`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📁 Структура проекта
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+├── assets/                  # Статические изображения и ресурсы
+├── components/              # React-компоненты (каждый в своей папке с CSS)
+│   ├── BookmarksModal/      # Модальное окно просмотра и управления закладками
+│   │   ├── BookmarksModal.css
+│   │   └── BookmarksModal.tsx
+│   ├── Reader/              # Основной экран чтения страницы
+│   │   ├── Reader.css
+│   │   └── Reader.tsx
+│   ├── Sidebar/             # Выдвижное боковое меню
+│   │   ├── Sidebar.css
+│   │   └── Sidebar.tsx
+│   ├── TableOfContents/     # Главная страница (оглавление и статистика)
+│   │   ├── TableOfContents.css
+│   │   └── TableOfContents.tsx
+│   └── auth/                # Модальные окна авторизации
+│       ├── LoginModal/      # Вход (Google / Telegram)
+│       │   ├── LoginModal.css
+│       │   └── LoginModal.tsx
+│       └── LogoutModal/     # Подтверждение выхода
+│           ├── LogoutModal.css
+│           └── LogoutModal.tsx
+├── context/                 # React Context провайдеры
+│   ├── AuthContext.tsx      # Состояние авторизации и методы входа/выхода
+│   └── BookContext.tsx      # Позиция чтения, прогресс и закладки
+├── data/                    # Тексты книги и структура глав
+│   └── chapters.ts
+├── services/                # API-сервисы
+│   └── AuthService.ts
+├── App.tsx                  # Корневой роутинг и компоновка приложения
+├── index.css                # Глобальные токены, переменные, типографика и стили кнопок
+└── main.tsx                 # Точка входа React
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Установка и запуск
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Клонирование и установка зависимостей
+
+```bash
+git clone <url-репозитория>
+cd memoirs
+npm install
 ```
-> Example SSH Reverse Tunnel command:
+
+### 2. Настройка переменных окружения
+
+Создайте файл `.env` на основе шаблона:
+
+```bash
+cp .env.example .env
+```
+
+Параметры:
+- `VITE_API_BASE` — базовый URL бэкенда для синхронизации (по умолчанию `http://localhost:3333`).
+- `VITE_GOOGLE_CLIENT_ID` — Client ID из Google Cloud Console (для Google Auth).
+- `VITE_TELEGRAM_BOT_NAME` — имя Telegram-бота (для виджета авторизации Telegram).
+
+### 3. Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу `http://localhost:5173/dev/`.
+
+> **SSH Reverse Tunnel** (при удалённой разработке):
 > ```bash
 > ssh -R 8090:localhost:5173 root@chalysh.pro -N
 > ```
+
+---
+
+## 🏗 Сборка и проверка
+
+- **Проверка типов и сборка для production**:
+  ```bash
+  npm run build
+  ```
+  Результат сборки помещается в директорию `dist/` с базовым путем `/memoirs/`.
+
+- **Предпросмотр сборки**:
+  ```bash
+  npm run preview
+  ```
+
+- **Линтинг**:
+  ```bash
+  npm run lint
+  ```
